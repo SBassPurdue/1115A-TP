@@ -6,6 +6,7 @@
 
 
 int i = 0;
+int autoMode = 1;
 
 char autonsColor[4][16] = {"Sample Auton 1", "Sample Auton 2", "Sample Auton 3", "Sample Auton 4"};
 int len = sizeof(autonsColor)/sizeof(autonsColor[0]);
@@ -14,9 +15,15 @@ char rollerInStr[2048] = "";
 
 //lv_roller_get_selected(redRoller);
 //lv_roller_set_selected(redRoller, **VALUE**, true)
+
+static lv_res_t rollerSetR(lv_obj_t *roller) {
+	autoMode = (lv_roller_get_selected(roller) + 1);
+}
+
 void scrollFn(int dir, lv_obj_t *roller) {
 	lv_roller_set_selected(roller, lv_roller_get_selected(roller) - dir, true);
 	actId = 0;
+	rollerSetR(roller);
 }
 
 static lv_res_t scrollRU(lv_obj_t *btn)
@@ -29,10 +36,6 @@ static lv_res_t scrollRD(lv_obj_t *btn)
 {
 	actId = -1;
 	return LV_RES_OK;
-}
-
-static lv_res_t rollerSetR(lv_obj_t *roller) {
-	autoMode = (lv_roller_get_selected(roller) + 1);
 }
 
 void autoPickFn(void* param) {
@@ -97,7 +100,6 @@ while (i < len) {strcat(rollerInStr, autonsColor[i]); i++; if(i != len) {strcat(
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	autoMode = 0;
 	pros::lcd::initialize();
 
 	/*int i = 7;

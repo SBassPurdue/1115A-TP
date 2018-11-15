@@ -13,27 +13,31 @@
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-int autoMode;
+
+pros::Motor driveL(DRIVE_LEFT);
+pros::Motor driveR(DRIVE_RIGHT);
+pros::Motor liftL(LIFT_LEFT);
+pros::Motor liftR(LIFT_RIGHT);
+pros::Motor puncherM1(PUNCHER_ONE);
+pros::Motor puncherM2(PUNCHER_TWO);
+pros::Motor ballInM(BALL_INTAKE);
+
+void deploy() {
+  ballInM.move_relative(25, 100);
+}
+
 void autonomous() {
-
-  pros::Motor driveL(DRIVE_LEFT);
-	pros::Motor driveR(DRIVE_RIGHT);
-	pros::Motor liftL(LIFT_LEFT);
-	pros::Motor liftR(LIFT_RIGHT);
-	pros::Motor puncherM1(PUNCHER_ONE);
-	pros::Motor puncherM2(PUNCHER_TWO);
-	pros::Motor ballInM(BALL_INTAKE);
-
-  if(autoMode == 0) {
-    ballInM.move(127);
+  if(autoMode == 1) {
+    deploy();
     driveL.move_relative(100, 100);
     driveR.move_relative(100, 100);
     while(!(driveL.is_stopped() && driveR.is_stopped())) {
       pros::delay(2);
     }
   }
-  if(autoMode == 1) {
-
+  
+  if(autoMode == 2) {
+    ballInM.move(-127);
   }
   if(autoMode == -1) {
 
