@@ -1,15 +1,95 @@
 #include "main.h"
+#include "autohook.h"
+#include "mathfunct.h"
+#include "display/lvgl.h"
+#include "display/lv_misc/lv_color.h"
 
-void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
-	}
+
+int i = 0;
+
+char autonsColor[4][16] = {"Sample Auton 1", "Sample Auton 2", "Sample Auton 3", "Sample Auton 4"};
+int len = sizeof(autonsColor)/sizeof(autonsColor[0]);
+int actId = 0;
+char rollerInStr[2048] = "";
+
+//lv_roller_get_selected(redRoller);
+//lv_roller_set_selected(redRoller, **VALUE**, true)
+void scrollFn(int dir, lv_obj_t *roller) {
+	lv_roller_set_selected(roller, lv_roller_get_selected(roller) - dir, true);
+	actId = 0;
 }
 
+static lv_res_t scrollRU(lv_obj_t *btn)
+{
+	actId = 1;
+	return LV_RES_OK;
+}
+
+static lv_res_t scrollRD(lv_obj_t *btn)
+{
+	actId = -1;
+	return LV_RES_OK;
+}
+
+static lv_res_t rollerSetR(lv_obj_t *roller) {
+	autoMode = (lv_roller_get_selected(roller) + 1);
+}
+
+void autoPickFn(void* param) {
+
+while (i < len) {strcat(rollerInStr, autonsColor[i]); i++; if(i != len) {strcat(rollerInStr, "\n");}}
+	/*----UI Object Inits----*/
+	//Tab View
+	lv_obj_t *tabObj;
+	tabObj = lv_tabview_create(lv_scr_act(), NULL);
+		lv_obj_t *redTab = lv_tabview_add_tab(tabObj, "Red");
+		lv_obj_t *blueTab = lv_tabview_add_tab(tabObj, "Blue");
+		lv_obj_t *skillsTab = lv_tabview_add_tab(tabObj, "Skills");
+
+	/*---Tab Contents---*/
+	//Red Tab
+	lv_obj_t *checkContRed = lv_cont_create(redTab, NULL);
+		lv_obj_align(checkContRed, redTab, LV_ALIGN_IN_TOP_LEFT, 10, 10);
+		lv_obj_set_size(checkContRed, 250, 150);
+
+	lv_obj_t *redRoller = lv_roller_create(checkContRed, NULL);
+		lv_roller_set_options(redRoller, rollerInStr);
+		lv_obj_align(redRoller, NULL, LV_ALIGN_IN_LEFT_MID, 5, 0);
+		lv_roller_set_action(redRoller, rollerSetR);
+
+	lv_obj_t *btnContRed = lv_cont_create(checkContRed, NULL);
+		lv_obj_align(btnContRed, NULL, LV_ALIGN_IN_TOP_RIGHT, 60, 15);
+		lv_obj_set_size(btnContRed, 60, 120);
+
+	lv_obj_t *redBtnUp = lv_btn_create(btnContRed, NULL);
+		lv_obj_set_size(redBtnUp, 50, 50);
+		lv_obj_align(redBtnUp, NULL, LV_ALIGN_IN_TOP_MID, 0, 5);
+		lv_btn_set_action(redBtnUp, LV_BTN_ACTION_PR, scrollRU);
+
+	lv_obj_t *redBtnDown = lv_btn_create(btnContRed, NULL);
+		lv_obj_set_size(redBtnDown, 50, 50);
+		lv_obj_align(redBtnDown, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, -5);
+		lv_btn_set_action(redBtnDown, LV_BTN_ACTION_PR, scrollRD);
+
+	//Blue Tab
+
+	//Skills Tab
+
+	//Main Loop
+	while (true) {
+		while (actId != 0) {
+			if(actId == 1 || actId == -1) {
+				scrollFn(actId, redRoller);
+			}
+		}
+		lv_btn_set_state(redBtnUp, LV_BTN_STATE_REL);
+		lv_btn_set_state(redBtnDown, LV_BTN_STATE_REL);
+		lv_roller_get_selected(redRoller) == 0 ? lv_btn_set_state(redBtnUp, LV_BTN_STATE_INA) : lv_roller_get_selected(redRoller) == len - 1 ? lv_btn_set_state(redBtnDown, LV_BTN_STATE_INA) : pros::delay(1);
+
+		lv_tick_inc(20);
+		pros::delay(20);
+	}
+}
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -17,8 +97,10 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
+	autoMode = 0;
 	pros::lcd::initialize();
-	int i = 7;
+
+	/*int i = 7;
 	char lyricsArray[57][40] = {"I hear the drums echoing tonight", "But she hears only whispers", "of some quiet conversation", "She's coming in, 12:30 flight", "The moonlit wings reflect the stars", "that guide me towards salvation", "I stopped an old man along the way", "Hoping to find some long forgotten", "words or ancient melodies", "He turned to me as if to say,", "\"Hurry boy, it's waiting there for you\"", "It\'s gonna take a lot to", "take me away from you", "There\'s nothing that a hundred", "men or more could ever do", "I bless the rains down in Africa", "Gonna take some time to do", "the things we never had", "The wild dogs cry out in the night", "As they grow restless,", "longing for some solitary company", "I know that I must do what's right", "As sure as Kilimanjaro rises like", "Olympus above the Serengeti", "I seek to cure what's deep inside,", "frightened of this thing", "that I\'ve become", "It\'s gonna take a lot to", "drag me away from you", "There\'s nothing that a hundred", "men or more could ever do", "I bless the rains down in Africa", "Gonna take some time to do", "the things we never had", "Hurry boy, she's waiting there for you", "It's gonna take a lot to", "drag me away from you", "There's nothing that a hundred", "men or more could ever do", "I bless the rains down in Africa", "I bless the rains down in Africa", "(I bless the rain)", "I bless the rains down in Africa", "(I bless the rain)", "I bless the rains down in Africa", "I bless the rains down in Africa", "(Ah, gonna take the time)", "Gonna take some time to do", "the things we never had"};
 	while(i < 57) {
 		pros::lcd::set_text(0, lyricsArray[i-7]);
@@ -31,8 +113,9 @@ void initialize() {
 		pros::lcd::set_text(7, lyricsArray[i]);
 		pros::delay(20);
 		i++;
-	}
-	pros::lcd::register_btn1_cb(on_center_button);
+	}*/
+
+	pros::Task autoPick(autoPickFn, 0, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Autonomous Picker");
 }
 
 /**

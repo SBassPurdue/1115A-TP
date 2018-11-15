@@ -1,5 +1,4 @@
 #include "main.h"
-#include "mathfunct.h"
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -74,7 +73,7 @@ void opcontrol() {
 		//capRotateM.move(127 * (master.get_digital(DIGITAL_LEFT)-master.get_digital(DIGITAL_RIGHT)));
 
 		//Ball Intake
-		ballInM.move(127 * (master.get_digital(DIGITAL_L2)-master.get_digital(DIGITAL_L1)));
+		ballInM.move(70 * (master.get_digital(DIGITAL_L2)-master.get_digital(DIGITAL_L1)));
 
 		//Drive Direction Toggle
 		if (master.get_digital(DIGITAL_Y) && release) {
@@ -86,8 +85,6 @@ void opcontrol() {
 		if(master.get_digital(DIGITAL_X) && master.get_digital(DIGITAL_A)) {
 			autonomous();
 		}
-
-
 
 		pros::delay(20);
 	}
