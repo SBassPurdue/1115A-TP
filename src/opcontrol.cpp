@@ -17,14 +17,20 @@
 
 void opcontrol() {
 	/* ---Variable Inits and Definintions --- */
-	bool release = true;
-	bool triggerRelease = true;
+	bool releaseA = true;
+	bool releaseB = true;
+	bool releaseY = true;
+	bool angleRelease = true;
 	bool revToggle = false;
 	//Drive Power
 	int lPow = 0;
 	int rPow = 0;
-	//Timer
-	int t = 0;
+
+	double lfTarg = 0;
+	double lbTarg = 0;
+	double rfTarg = 0;
+	double rbTarg = 0;
+	int angleTarg = 0;
 
 	//Controller Inits
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
@@ -63,29 +69,53 @@ void opcontrol() {
 
 		//Puncher
 		puncherM.move(-127 * master.get_digital(DIGITAL_A));
+		if (master.get_digital(DIGITAL_A)) {releaseA = false;}
+		if (!master.get_digital(DIGITAL_A) && !releaseA) {
+			releaseA = true;
+			angleRelease = true;
+		}
 
 		//Angle Changer
 		puncherAngleM.move(60 * (master.get_digital(DIGITAL_R2) - master.get_digital(DIGITAL_R1)));
+
+		if (master.get_digital(DIGITAL_R2) || master.get_digital(DIGITAL_R1)) {
+			angleRelease = false;
+			angleTarg = puncherAngleM.get_position();
+		}
+		if (!master.get_digital(DIGITAL_R2) && !master.get_digital(DIGITAL_R1) && !angleRelease) { //No input AND angle is free
+			puncherAngleM.move_absolute(angleTarg, 50);
+		}
 
 		//Ball Intake
 		ballInM.move(-90 * (master.get_digital(DIGITAL_L2)-master.get_digital(DIGITAL_L1)));
 
 		//Drive Direction Toggle
-		if (master.get_digital(DIGITAL_Y) && release) {
-			release = false;
+		if (master.get_digital(DIGITAL_Y) && releaseY) {
+			releaseY = false;
 			revToggle = !revToggle;
 		}
+		if (!master.get_digital(DIGITAL_Y)) {releaseY = true;}
 
-		if (!master.get_digital(DIGITAL_A) && !master.get_digital(DIGITAL_Y)) {release = true;}
-
-		//TODO: Brake Logic
+		//Brake Button
+		if (master.get_digital(DIGITAL_B) && releaseB) {
+			releaseB = false;
+			lfTarg = driveLF.get_position();
+			lbTarg = driveLB.get_position();
+			rfTarg = driveRF.get_position();
+			rbTarg = driveRB.get_position();
+		} else if(master.get_digital(DIGITAL_B)) {
+			driveLF.move_absolute(lfTarg, 130);
+			driveLB.move_absolute(lbTarg, 130);
+			driveRF.move_absolute(rfTarg, 130);
+			driveRB.move_absolute(rbTarg, 130);
+		}
+		if (!master.get_digital(DIGITAL_B)) {releaseB = true;}
 
 		//Auton call (used in testing & debugging autons w/o competition switch)
 		if(master.get_digital(DIGITAL_UP) && master.get_digital(DIGITAL_RIGHT)) {
 			autonomous();
 		}
 
-		t = t - 20;
 		pros::delay(20);
 	}
 }
