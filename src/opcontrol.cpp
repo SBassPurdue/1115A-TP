@@ -1,4 +1,5 @@
 #include "main.h"
+#include <math.h>
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -13,79 +14,78 @@
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-void capSpinTaskFn(void* param) {
-	bool release = true;
-	double changeFactor = 0;
-	double motorOld = 0;
-	double target = 0;
-	pros::Motor capRotateM(CAP_ROTATOR);
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Controller partner(pros::E_CONTROLLER_PARTNER);
 
-	while (true) {
-
-		if ((master.get_digital(DIGITAL_UP) || master.get_digital(DIGITAL_DOWN) || master.get_digital(DIGITAL_LEFT) || master.get_digital(DIGITAL_RIGHT)) && release) {
-			release = false;
-			changeFactor = ((450 * (master.get_digital(DIGITAL_UP)-master.get_digital(DIGITAL_DOWN))) + (25 * (master.get_digital(DIGITAL_LEFT) - master.get_digital(DIGITAL_RIGHT))));
-		}
-		if (!(master.get_digital(DIGITAL_UP) || master.get_digital(DIGITAL_DOWN) || master.get_digital(DIGITAL_LEFT) || master.get_digital(DIGITAL_RIGHT))) {release = true;}
-
-
-		target = target + changeFactor;
-		capRotateM.move_absolute(target, 100);
-		changeFactor = 0;
-		pros::delay(10);
-	}
-}
 void opcontrol() {
-
+	/* ---Variable Inits and Definintions --- */
 	bool release = true;
+	bool triggerRelease = true;
 	bool revToggle = false;
+	//Drive Power
+	int lPow = 0;
+	int rPow = 0;
+	//Timer
+	int t = 0;
+
+	//Controller Inits
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 	pros::Controller partner(pros::E_CONTROLLER_PARTNER);
-	pros::Task capSpin(capSpinTaskFn, 0, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Cap Spin Task");
 
-
-	pros::Motor driveL(DRIVE_LEFT);
-	pros::Motor driveR(DRIVE_RIGHT);
-	pros::Motor liftL(LIFT_LEFT);
-	pros::Motor liftR(LIFT_RIGHT);
-	pros::Motor puncherM1(PUNCHER_ONE);
-	pros::Motor puncherM2(PUNCHER_TWO);
+	//Motor Inits
+	pros::Motor driveLF(DRIVE_LEFT_FRONT);
+	pros::Motor driveLB(DRIVE_LEFT_BACK);
+	pros::Motor driveRF(DRIVE_RIGHT_FRONT);
+	pros::Motor driveRB(DRIVE_RIGHT_BACK);
+	pros::Motor puncherM(PUNCHER_MOTOR);
+	pros::Motor puncherAngleM(PUNCHER_ANGLE);
 	pros::Motor ballInM(BALL_INTAKE);
 
+	driveLF.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	driveLB.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	driveRF.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	driveRB.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	puncherAngleM.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+	//Main Loop
 	while (true) {
 
-		//Drive Controls (Voltage)
-		driveL.move(revToggle ? 1 * master.get_analog(ANALOG_LEFT_Y) : -1 * master.get_analog(ANALOG_RIGHT_Y));
-		driveR.move(revToggle ? -1 * master.get_analog(ANALOG_RIGHT_Y) : 1 * master.get_analog(ANALOG_LEFT_Y));
+		/* ---Drive Controls (Voltage)--- */
+		lPow =  master.get_analog(ANALOG_LEFT_Y);
+		rPow =  -master.get_analog(ANALOG_RIGHT_Y);
 
-		//Lift Controls
-		liftR.move(-127 * (master.get_digital(DIGITAL_R1)-master.get_digital(DIGITAL_R2)));
-		liftL.move(127 * (master.get_digital(DIGITAL_R1)-master.get_digital(DIGITAL_R2)));
+		driveLF.move(revToggle ? rPow : lPow);
+		driveLB.move(revToggle ? rPow : lPow);
+		driveRF.move(revToggle ? lPow : rPow);
+		driveRB.move(revToggle ? lPow : rPow);
 
-		/*Misc. Button Controls*/
+		/* ---Misc. Button Controls--- */
+
+		//Cap Flipper
+
 		//Puncher
-		puncherM1.move(127 * (master.get_digital(DIGITAL_A)));
-		puncherM2.move(-127 * (master.get_digital(DIGITAL_A)));
+		puncherM.move(-127 * master.get_digital(DIGITAL_A));
 
-		//Cap Rotation
-		//capRotateM.move(127 * (master.get_digital(DIGITAL_LEFT)-master.get_digital(DIGITAL_RIGHT)));
+		//Angle Changer
+		puncherAngleM.move(60 * (master.get_digital(DIGITAL_R2) - master.get_digital(DIGITAL_R1)));
 
 		//Ball Intake
-		ballInM.move(70 * (master.get_digital(DIGITAL_L2)-master.get_digital(DIGITAL_L1)));
+		ballInM.move(-90 * (master.get_digital(DIGITAL_L2)-master.get_digital(DIGITAL_L1)));
 
 		//Drive Direction Toggle
 		if (master.get_digital(DIGITAL_Y) && release) {
 			release = false;
 			revToggle = !revToggle;
 		}
-		if (!master.get_digital(DIGITAL_Y)) {release = true;}
 
-		if(master.get_digital(DIGITAL_X) && master.get_digital(DIGITAL_A)) {
+		if (!master.get_digital(DIGITAL_A) && !master.get_digital(DIGITAL_Y)) {release = true;}
+
+		//TODO: Brake Logic
+
+		//Auton call (used in testing & debugging autons w/o competition switch)
+		if(master.get_digital(DIGITAL_UP) && master.get_digital(DIGITAL_RIGHT)) {
 			autonomous();
 		}
 
+		t = t - 20;
 		pros::delay(20);
 	}
 }
