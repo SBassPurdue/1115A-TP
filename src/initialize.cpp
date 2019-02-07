@@ -9,7 +9,7 @@ int i = 0;
 int autoMode = 1;
 
 //Auton Name Array
-char autonsColor[2][20] = {"Placeholder", "Placeholder"};
+char autonsColor[3][20] = {"Placeholder", "Back Side 4 pt.", "Placeholder"};
 int len = sizeof(autonsColor)/sizeof(autonsColor[0]);
 int actId = 0;
 //String to send to the roller UI element

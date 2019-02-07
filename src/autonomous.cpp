@@ -52,7 +52,7 @@ void drive(int distance, int speed) {
 }
 
 void turn(float angle, int speed) {
-  angle = angle * 32 / 4;
+  angle = angle * 9;
   int useAngle = floor(angle);
   driveLF.move_relative(-useAngle, speed);
   driveLB.move_relative(-useAngle, speed);
@@ -72,6 +72,47 @@ void wait(int time) {
 }
 
 void autonomous() {
+
+  if(autoMode == 2) {
+    //Move to the cap
+    drive(3000, 110);
+    pros::delay(500);
+    settleDrive(-1);
+    drive(1250, 50);
+    //Succ the ball
+    ballInM.move(70);
+    settleDrive(-1);
+    pros::delay(2500);
+    //Platform align
+    drive(-700, 110);
+    ballInM.move_relative(-250, 50);
+    settleDrive(1000);
+    turn(-90, 80);
+    pros::delay(1500);
+    //Just fucking send it
+    drive(-2250, 200);
+    settleDrive(2000);
+  }
+
+  if(autoMode == -2) {
+    //Move to the cap
+    drive(3000, 110);
+    pros::delay(500);
+    settleDrive(-1);
+    drive(1250, 50);
+    //Succ the ball
+    ballInM.move(70);
+    settleDrive(-1);
+    pros::delay(2500);
+    //Platform align
+    drive(-700, 110);
+    ballInM.move_relative(-250, 50);
+    settleDrive(1000);
+    turn(90, 80);
+    pros::delay(1500);
+    drive(-2250, 200);
+    settleDrive(2000);
+  }
 
   /*
   if(autoMode == 1) {
@@ -138,54 +179,7 @@ void autonomous() {
     pros::delay(250);
     drive(2750, 100);
     pros::delay(4000);
-  }
-
-  if(autoMode == 2) {
-    //Move to the cap
-    drive(-3000, 110);
-    pros::delay(500);
-    settleDrive(-1);
-    drive(-1250, 50);
-    //Succ the ball
-    ballInM.move(70);
-    settleDrive(-1);
-    pros::delay(2500);
-    //Platform align
-    drive(750, 110);
-    capFlipM.move_relative(-750, 50);
-    settleDrive(1000);
-    turn(-90, 80);
-    pros::delay(1500);
-    //Just fucking send it
-    drive(2250, 200);
-    settleDrive(2000);
-  }
-
-  if(autoMode == -2) {
-    //Move to the cap
-    drive(-3000, 110);
-    pros::delay(500);
-    settleDrive(-1);
-    drive(-1250, 50);
-    //Succ the ball
-    ballInM.move(70);
-    settleDrive(-1);
-    pros::delay(2500);
-    //Platform align
-    drive(750, 110);
-    capFlipM.move_relative(-750, 50);
-    settleDrive(1000);
-    turn(90, 80);
-    pros::delay(1500);
-    drive(2250, 200);
-    settleDrive(2000);
-  }
-
-  if(autoMode == 3 || autoMode == -3) {
-    fireCatapult();
-    pros::delay(2000);
-  }
-  */
+  } */
 }
 
 
