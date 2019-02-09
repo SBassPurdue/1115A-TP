@@ -76,14 +76,13 @@ void opcontrol() {
 		}
 
 		//Angle Changer
-		puncherAngleM.move(60 * (master.get_digital(DIGITAL_R2) - master.get_digital(DIGITAL_R1)));
+		if (master.get_digital(DIGITAL_R1)) {angleTarg = -500; angleRelease = false;}
+		if (master.get_digital(DIGITAL_R2)) {angleTarg = 0; angleRelease = false;}
+		puncherAngleM.move_absolute(angleTarg, 50);
 
-		if (master.get_digital(DIGITAL_R2) || master.get_digital(DIGITAL_R1)) {
-			angleRelease = false;
+		if (master.get_digital(DIGITAL_UP) || master.get_digital(DIGITAL_DOWN)) {
+			puncherAngleM.move(-60 * (master.get_digital(DIGITAL_UP) - master.get_digital(DIGITAL_DOWN)));
 			angleTarg = puncherAngleM.get_position();
-		}
-		if (!master.get_digital(DIGITAL_R2) && !master.get_digital(DIGITAL_R1) && !angleRelease) { //No input AND angle is free
-			puncherAngleM.move_absolute(angleTarg, 50);
 		}
 
 		//Ball Intake
@@ -112,7 +111,7 @@ void opcontrol() {
 		if (!master.get_digital(DIGITAL_B)) {releaseB = true;}
 
 		//Auton call (used in testing & debugging autons w/o competition switch)
-		if(master.get_digital(DIGITAL_UP) && master.get_digital(DIGITAL_RIGHT)) {
+		if(master.get_digital(DIGITAL_LEFT) && master.get_digital(DIGITAL_RIGHT)) {
 			autonomous();
 		}
 
