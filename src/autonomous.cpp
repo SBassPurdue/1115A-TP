@@ -22,6 +22,9 @@ pros::Motor driveLB(DRIVE_LEFT_BACK);
 pros::Motor driveRF(DRIVE_RIGHT_FRONT);
 pros::Motor driveRB(DRIVE_RIGHT_BACK);
 pros::Motor ballInM(BALL_INTAKE);
+pros::Motor puncherM(PUNCHER_MOTOR);
+pros::Motor puncherAngleM(PUNCHER_ANGLE);
+
 
 //How tf does this work again?
 void settleDrive(int t) {
@@ -60,6 +63,16 @@ void turn(float angle, int speed) {
   driveRB.move_relative(-useAngle, speed);
 }
 
+void firePuncher() {
+  int t = 900;
+  while(t > 0) {
+    puncherM.move(-127);
+    t = t - 20;
+    pros::delay(20);
+  }
+  puncherM.move(0);
+}
+
 void firstCapRoutine() {
   //Move to the cap
   drive(3000, 110);
@@ -70,6 +83,7 @@ void firstCapRoutine() {
   ballInM.move(70);
   settleDrive(-1);
   pros::delay(2500);
+  ballInM.move_relative(-250, 50);
 }
 
 void wait(int time) {
@@ -87,19 +101,56 @@ void autonomous() {
 
   if(autoMode == 1) {
     firstCapRoutine();
-
+    //Go Home
+    drive(-4000, 110);
+    settleDrive(-1);
+    //Touch base
+    drive(-500, 50);
+    pros::delay(1000);
+    drive(500, 50);
+    settleDrive(-1);
+    turn(90, 80);
+    pros::delay(1500);
+    firePuncher();
+    ballInM.move(110);
+    puncherAngleM.move_absolute(-500, 100);
+    pros::delay(500);
+    firePuncher();
+    turn(10, 80);
+    puncherAngleM.move(0);
+    pros::delay(500);
+    drive(4000, 100);
+    settleDrive(-1);
   }
 
   if(autoMode == -1) {
     firstCapRoutine();
-
+    //Go Home
+    drive(-4000, 110);
+    settleDrive(-1);
+    //Touch base
+    drive(-500, 50);
+    pros::delay(1000);
+    drive(500, 50);
+    settleDrive(-1);
+    turn(-90, 80);
+    pros::delay(1500);
+    firePuncher();
+    ballInM.move(110);
+    puncherAngleM.move_absolute(-500, 100);
+    pros::delay(500);
+    firePuncher();
+    turn(-10, 80);
+    puncherAngleM.move(0);
+    pros::delay(500);
+    drive(4000, 100);
+    settleDrive(-1);
   }
 
   if(autoMode == 2) {
     firstCapRoutine();
     //Platform align
     drive(-700, 110);
-    ballInM.move_relative(-250, 50);
     settleDrive(1000);
     turn(-90, 80);
     pros::delay(1500);
@@ -112,12 +163,43 @@ void autonomous() {
     firstCapRoutine();
     //Platform align
     drive(-700, 110);
-    ballInM.move_relative(-250, 50);
     settleDrive(1000);
     turn(90, 80);
     pros::delay(1500);
     drive(-2250, 200);
     settleDrive(2000);
+  }
+
+  if(autoMode == 3 || autoMode == -3) {
+    //Move to the cap
+    drive(4250, 110);
+    pros::delay(500);
+    settleDrive(-1);
+    //Succ the ball
+    ballInM.move(70);
+    settleDrive(-1);
+    pros::delay(2500);
+    ballInM.move_relative(-250, 50);
+    //Go Home
+    drive(-4000, 110);
+    settleDrive(-1);
+    //Touch base
+    drive(-500, 50);
+    pros::delay(1000);
+    drive(500, 50);
+    settleDrive(-1);
+    turn(-90, 80);
+    pros::delay(1500);
+    firePuncher();
+    ballInM.move(110);
+    puncherAngleM.move_absolute(-500, 100);
+    pros::delay(500);
+    firePuncher();
+    turn(-10, 80);
+    puncherAngleM.move(0);
+    pros::delay(500);
+    drive(4000, 100);
+    settleDrive(-1);
   }
 }
 

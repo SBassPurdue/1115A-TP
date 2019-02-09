@@ -86,7 +86,7 @@ void opcontrol() {
 		}
 
 		//Ball Intake
-		ballInM.move(-90 * (master.get_digital(DIGITAL_L2)-master.get_digital(DIGITAL_L1)));
+		ballInM.move(-110 * (master.get_digital(DIGITAL_L2)-master.get_digital(DIGITAL_L1)));
 
 		//Drive Direction Toggle
 		if (master.get_digital(DIGITAL_Y) && releaseY) {
