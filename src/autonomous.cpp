@@ -60,6 +60,18 @@ void turn(float angle, int speed) {
   driveRB.move_relative(-useAngle, speed);
 }
 
+void firstCapRoutine() {
+  //Move to the cap
+  drive(3000, 110);
+  pros::delay(500);
+  settleDrive(-1);
+  drive(1250, 50);
+  //Succ the ball
+  ballInM.move(70);
+  settleDrive(-1);
+  pros::delay(2500);
+}
+
 void wait(int time) {
   while (time > 0) {
     driveLF.move_relative(0, 0);
@@ -73,16 +85,18 @@ void wait(int time) {
 
 void autonomous() {
 
+  if(autoMode == 1) {
+    firstCapRoutine();
+
+  }
+
+  if(autoMode == -1) {
+    firstCapRoutine();
+
+  }
+
   if(autoMode == 2) {
-    //Move to the cap
-    drive(3000, 110);
-    pros::delay(500);
-    settleDrive(-1);
-    drive(1250, 50);
-    //Succ the ball
-    ballInM.move(70);
-    settleDrive(-1);
-    pros::delay(2500);
+    firstCapRoutine();
     //Platform align
     drive(-700, 110);
     ballInM.move_relative(-250, 50);
@@ -95,15 +109,7 @@ void autonomous() {
   }
 
   if(autoMode == -2) {
-    //Move to the cap
-    drive(3000, 110);
-    pros::delay(500);
-    settleDrive(-1);
-    drive(1250, 50);
-    //Succ the ball
-    ballInM.move(70);
-    settleDrive(-1);
-    pros::delay(2500);
+    firstCapRoutine();
     //Platform align
     drive(-700, 110);
     ballInM.move_relative(-250, 50);
@@ -113,73 +119,6 @@ void autonomous() {
     drive(-2250, 200);
     settleDrive(2000);
   }
-
-  /*
-  if(autoMode == 1) {
-    //Move to the cap
-    drive(-3000, 110);
-    pros::delay(500);
-    settleDrive(-1);
-    drive(-1250, 50);
-    //Succ the ball
-    ballInM.move(70);
-    settleDrive(-1);
-    pros::delay(2500);
-    //Go home
-    drive(4000, 150);
-    pros::delay(400);
-    settleDrive(-1);
-    drive(1000, 50);
-    pros::delay(500);
-    //Scoot Forward
-    drive(-480, 100);
-    settleDrive(750);
-    //Turn and fire
-    turn(-90, 80);
-    pros::delay(1500);
-    drive(750, 50);
-    settleDrive(500);
-    wait(500);
-    fireCatapult();
-    pros::delay(500);
-    //Go for bottom flag
-    pros::delay(250);
-    drive(2750, 100);
-    pros::delay(4000);
-  }
-
-  if(autoMode == -1) {
-    //Move to the cap
-    drive(-3000, 110);
-    pros::delay(500);
-    settleDrive(-1);
-    drive(-1250, 50);
-    //Succ the ball
-    ballInM.move(70);
-    settleDrive(-1);
-    pros::delay(2500);
-    //Go home
-    drive(4000, 150);
-    pros::delay(400);
-    settleDrive(-1);
-    drive(1000, 50);
-    pros::delay(500);
-    //Scoot Forward
-    drive(-480, 100);
-    settleDrive(750);
-    //Turn and fire
-    turn(90, 80);
-    pros::delay(1500);
-    drive(750, 50);
-    settleDrive(500);
-    wait(500);
-    fireCatapult();
-    pros::delay(500);
-    //Go for bottom flag
-    pros::delay(250);
-    drive(2750, 100);
-    pros::delay(4000);
-  } */
 }
 
 
