@@ -107,13 +107,13 @@ void autonomous() {
     //Touch base
     drive(-500, 50);
     pros::delay(1000);
-    drive(500, 50);
+    drive(400, 50);
     settleDrive(-1);
     turn(90, 80);
-    pros::delay(1500);
+    pros::delay(1000);
     firePuncher();
     ballInM.move(110);
-    puncherAngleM.move_absolute(-500, 100);
+    puncherAngleM.move_absolute(-350, 100);
     pros::delay(500);
     firePuncher();
     turn(10, 80);
@@ -131,13 +131,13 @@ void autonomous() {
     //Touch base
     drive(-500, 50);
     pros::delay(1000);
-    drive(500, 50);
+    drive(400, 50);
     settleDrive(-1);
     turn(-90, 80);
-    pros::delay(1500);
+    pros::delay(1000);
     firePuncher();
     ballInM.move(110);
-    puncherAngleM.move_absolute(-500, 100);
+    puncherAngleM.move_absolute(-350, 100);
     pros::delay(500);
     firePuncher();
     turn(-10, 80);
@@ -150,7 +150,7 @@ void autonomous() {
   if(autoMode == 2) {
     firstCapRoutine();
     //Platform align
-    drive(-700, 110);
+    drive(-750, 110);
     settleDrive(1000);
     turn(-90, 80);
     pros::delay(1500);
@@ -162,7 +162,7 @@ void autonomous() {
   if(autoMode == -2) {
     firstCapRoutine();
     //Platform align
-    drive(-700, 110);
+    drive(-750, 110);
     settleDrive(1000);
     turn(90, 80);
     pros::delay(1500);
@@ -186,7 +186,7 @@ void autonomous() {
     //Touch base
     drive(-500, 50);
     pros::delay(1000);
-    drive(500, 50);
+    drive(400, 50);
     settleDrive(-1);
     turn(-90, 80);
     pros::delay(1500);

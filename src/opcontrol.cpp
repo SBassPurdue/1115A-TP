@@ -76,13 +76,18 @@ void opcontrol() {
 		}
 
 		//Angle Changer
-		if (master.get_digital(DIGITAL_R1)) {angleTarg = -500; angleRelease = false;}
+		if (master.get_digital(DIGITAL_R1)) {angleTarg = -350; angleRelease = false;}
 		if (master.get_digital(DIGITAL_R2)) {angleTarg = 0; angleRelease = false;}
 		puncherAngleM.move_absolute(angleTarg, 50);
 
 		if (master.get_digital(DIGITAL_UP) || master.get_digital(DIGITAL_DOWN)) {
 			puncherAngleM.move(-60 * (master.get_digital(DIGITAL_UP) - master.get_digital(DIGITAL_DOWN)));
 			angleTarg = puncherAngleM.get_position();
+		}
+		//Manually reset the encoder
+		if (master.get_digital(DIGITAL_LEFT)) {
+			puncherAngleM.move(0);
+			puncherAngleM.set_zero_position(puncherAngleM.get_position());
 		}
 
 		//Ball Intake
